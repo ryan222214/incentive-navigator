@@ -29,8 +29,6 @@ body {
   color: var(--text);
 }
 
-/* Shell layout */
-
 .app-shell {
   min-height: 100vh;
   display: flex;
@@ -147,6 +145,11 @@ textarea {
   width: 100%;
 }
 
+.btn.small {
+  padding: 8px 12px;
+  font-size: 0.8rem;
+}
+
 .btn.primary {
   background: linear-gradient(135deg, var(--accent), var(--accent-soft));
   color: #0f172a;
@@ -163,6 +166,17 @@ textarea {
   box-shadow: 0 6px 16px rgba(56, 189, 248, 0.3);
 }
 
+.btn.ghost {
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--muted);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.btn.ghost:hover {
+  background: rgba(31, 41, 55, 0.95);
+  color: var(--text);
+}
+
 /* Hint text */
 
 .hint {
@@ -172,6 +186,14 @@ textarea {
 }
 
 /* Result layout */
+
+.result-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
 
 .quick-summary {
   margin-bottom: 14px;
@@ -216,6 +238,49 @@ textarea {
   margin-bottom: 4px;
 }
 
+/* Paths section */
+
+.paths-title {
+  margin: 18px 0 4px;
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.paths-intro {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.paths-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.path-card {
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 14px;
+  padding: 10px 12px 11px;
+  border: 1px solid rgba(30, 64, 175, 0.7);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.9);
+}
+
+.path-card h3 {
+  margin: 0 0 6px;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+
+.path-card p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #e5e7eb;
+}
+
 /* Footer */
 
 .app-footer {
@@ -232,10 +297,14 @@ textarea {
   display: none;
 }
 
-/* Small screens */
+/* Responsive */
 
 @media (max-width: 840px) {
   .result-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .paths-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -251,5 +320,14 @@ textarea {
 
   .result-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .paths-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .result-header-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
