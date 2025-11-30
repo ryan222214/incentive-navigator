@@ -46,12 +46,17 @@
         </button>
 
         <p class="hint">
-          Do not worry about perfect wording. A couple of sentences are enough.
+          A couple of sentences is enough. Focus on what is actually happening, not on speeches.
         </p>
       </section>
 
       <section id="resultSection" class="panel hidden">
-        <h2>Incentive breakdown</h2>
+        <div class="result-header-row">
+          <h2>Incentive breakdown</h2>
+          <button id="copyBtn" class="btn ghost small">
+            Copy analysis
+          </button>
+        </div>
 
         <div id="quickSummary" class="quick-summary hidden"></div>
 
@@ -87,14 +92,34 @@
           </div>
         </div>
 
+        <h2 class="paths-title">Strategy paths</h2>
+        <p class="paths-intro">
+          Most situations have three broad paths. These are not advice. They help you think clearly about tradeoffs.
+        </p>
+
+        <div class="paths-grid">
+          <div class="path-card">
+            <h3>Path A: Stay the course</h3>
+            <p id="pathStay"></p>
+          </div>
+          <div class="path-card">
+            <h3>Path B: Change from inside</h3>
+            <p id="pathChangeInside"></p>
+          </div>
+          <div class="path-card">
+            <h3>Path C: Exit and pivot</h3>
+            <p id="pathExit"></p>
+          </div>
+        </div>
+
         <p class="hint">
-          This tool does not tell you what to think. It shows you how incentives shape behavior so you can choose your own path.
+          This tool does not tell you what to think. It shows how incentives shape behavior so you can choose your own move on purpose.
         </p>
       </section>
     </main>
 
     <footer class="app-footer">
-      <span>Incentive Navigator v1 · No accounts · No tracking · Static site</span>
+      <span>Incentive Navigator v1.1 · No accounts · No tracking · Static site</span>
     </footer>
   </div>
 
