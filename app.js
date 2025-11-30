@@ -1,7 +1,6 @@
-// Incentive Navigator v1
+// Incentive Navigator v1.1
 // Static, no backend, no AI. Pure framework.
 
-// Grab DOM elements
 const situationInput = document.getElementById("situationInput");
 const situationTypeSelect = document.getElementById("situationType");
 const analyzeBtn = document.getElementById("analyzeBtn");
@@ -16,10 +15,15 @@ const outcomesList = document.getElementById("outcomesList");
 const questionsList = document.getElementById("questionsList");
 const movesList = document.getElementById("movesList");
 
+const copyBtn = document.getElementById("copyBtn");
+const pathStayEl = document.getElementById("pathStay");
+const pathChangeInsideEl = document.getElementById("pathChangeInside");
+const pathExitEl = document.getElementById("pathExit");
+
 // Base templates for each situation type
 const BASE_TEMPLATES = {
   work: {
-    label: "Work or career",
+    label: "work or career",
     actors: [
       "You as the worker, with limited time and energy",
       "Your manager or boss, who is judged on team output and stability",
@@ -49,10 +53,18 @@ const BASE_TEMPLATES = {
       "Make invisible costs visible, for example by calmly explaining tradeoffs",
       "Set clear boundaries in writing instead of only hinting at them",
       "Start building outside options so that you are less dependent on one gatekeeper"
-    ]
+    ],
+    paths: {
+      stay:
+        "You keep the current arrangement and accept that the system will follow its metrics. This can be useful if you need short term stability while you quietly build skills, savings, or outside options. The risk is that the pattern hardens and your resentment grows faster than your leverage.",
+      changeInside:
+        "You try to shape incentives from inside. That can look like documenting the impact of the current pattern, making your boundaries explicit, or proposing small changes that make life better for you without adding big risk for them. This takes energy and patience, but sometimes unlocks better conditions without burning bridges.",
+      exit:
+        "You begin planning an exit so that this situation no longer controls you. That might involve learning skills, building a portfolio, saving a runway, or moving to a team or employer whose incentives match how you want to live. This path can be slower at first but often gives the largest long term change."
+    }
   },
   money: {
-    label: "Money, business, or pricing",
+    label: "money, business, or pricing",
     actors: [
       "You as the buyer, client, or user",
       "The seller or representative in front of you",
@@ -69,7 +81,7 @@ const BASE_TEMPLATES = {
       "Complex terms and fees make it harder for you to compare alternatives"
     ],
     outcomes: [
-      "Upsells, add ons, and subscriptions are often pushed even when not ideal for you",
+      "Upsells, add ons, and subscriptions are often pushed even when they are not ideal for you",
       "Default options will usually favor the company over your long term benefit",
       "If you do nothing, you may slowly pay more than you realize over time"
     ],
@@ -82,10 +94,18 @@ const BASE_TEMPLATES = {
       "Compare at least one outside option before committing",
       "Ask for simple, concrete numbers instead of general promises",
       "Decide your red lines in advance so you are not pressured in the moment"
-    ]
+    ],
+    paths: {
+      stay:
+        "You accept the current pricing or arrangement and treat it as a conscious choice instead of a trap. This can be fine if the cost is small relative to the value you receive and you are not pretending it is something else.",
+      changeInside:
+        "You renegotiate or simplify. That might mean asking for a cheaper tier, removing extras, paying yearly instead of monthly, or moving to a clearer plan. The goal is to bend the current relationship closer to your interests without walking away entirely.",
+      exit:
+        "You end or avoid the deal and choose a different provider or method. This can feel inconvenient in the short term but often leads to much better alignment over time, especially if you pick systems that are built around transparency instead of confusion."
+    }
   },
   policy: {
-    label: "Rules, policies, or institutions",
+    label: "rules, policies, or institutions",
     actors: [
       "You as the individual affected by the rule",
       "The frontline person enforcing the rule",
@@ -97,7 +117,7 @@ const BASE_TEMPLATES = {
       "The institution wants consistency, legal protection, and control"
     ],
     incentives: [
-      "Policies are often written to avoid worst case scenarios, not optimize for you",
+      "Policies are often written to avoid worst case scenarios, not to optimize for you",
       "Staff are usually punished for breaking rules, not rewarded for making exceptions",
       "Complex systems prefer rigid rules because it makes them easier to administer"
     ],
@@ -115,10 +135,18 @@ const BASE_TEMPLATES = {
       "Stay calm and ask for the written policy or source instead of arguing in the abstract",
       "Document what happens so you can escalate with specifics, not just feelings",
       "Look for parallel paths instead of only pushing on one closed door"
-    ]
+    ],
+    paths: {
+      stay:
+        "You comply with the policy and redirect your energy elsewhere. This is sensible when the cost to fight is high and the stakes for you are low. You preserve time and attention for areas where your leverage is higher.",
+      changeInside:
+        "You work through the official channels, gather documentation, and make a precise case. You accept that the institution moves slowly, and you try to adjust incentives by making it more costly for them to ignore your situation or similar ones.",
+      exit:
+        "You minimize your dependence on this institution by finding alternatives, reducing your exposure, or reorganizing your life so that this rule matters less. This is often the most powerful long term move, even if it is not quick."
+    }
   },
   relationship: {
-    label: "Friends, family, or social",
+    label: "friends, family, or social dynamics",
     actors: [
       "You, with your needs, limits, and expectations",
       "The other person or people, with their own fears and desires",
@@ -148,10 +176,18 @@ const BASE_TEMPLATES = {
       "Describe the pattern and how it affects you, instead of attacking the person",
       "Set one small boundary and keep it, rather than trying to fix everything at once",
       "Invest in relationships that reward honesty so you are less trapped by one dynamic"
-    ]
+    ],
+    paths: {
+      stay:
+        "You keep the relationship as it is and accept the current pattern. This can make sense if the cost of change is higher than the benefit right now, but it also means planning for how you will protect your energy inside that pattern.",
+      changeInside:
+        "You name the pattern gently, state one clear boundary, and watch what happens. You focus on changing your own behavior in small, consistent steps instead of trying to fix the other person in one conversation.",
+      exit:
+        "You create distance or end the relationship, especially if it is draining or harmful. This is often emotionally hard but can create room for healthier dynamics that do not punish honesty."
+    }
   },
   other: {
-    label: "Other or mixed situations",
+    label: "mixed or other situations",
     actors: [
       "You as the observer or participant",
       "The people or groups whose choices you are puzzled by",
@@ -181,17 +217,25 @@ const BASE_TEMPLATES = {
       "Reframe the situation in terms of who gains what if you act or stay silent",
       "Look for small changes in your own behavior that change the payoff structure",
       "Focus on leverage points where small shifts in incentives can have large effects"
-    ]
+    ],
+    paths: {
+      stay:
+        "You observe the pattern and treat it as information. You do not try to change the system right away. Instead you use what you see to adjust your own expectations and choices.",
+      changeInside:
+        "You experiment with small interventions that might adjust incentives. That could be how you communicate, what you reward, what you ignore, or how you structure agreements.",
+      exit:
+        "You step out of this particular game and choose different games where your values, skills, and incentives line up more cleanly. Often the biggest shift comes not from winning the old game but from selecting a better one."
+    }
   }
 };
 
-// Keyword based tweaks to make the analysis feel more specific
+// Keyword based tweaks
 const KEYWORD_HINTS = [
   {
     keywords: ["rent", "landlord", "lease"],
     incentives: [
-      "Landlords respond strongly to local supply and demand for housing, not just individual stories",
-      "If demand is high and vacancies are low, raising rent is rewarded and lowering it is punished"
+      "Landlords respond strongly to local supply and demand for housing, not just individual stories.",
+      "If demand is high and vacancies are low, raising rent is rewarded and lowering it is punished."
     ],
     questions: [
       "What is the realistic alternative market rate around you",
@@ -201,8 +245,8 @@ const KEYWORD_HINTS = [
   {
     keywords: ["subscription", "monthly fee", "premium", "upgrade"],
     incentives: [
-      "Subscription models create smooth, predictable income for the company, which investors value",
-      "Free tiers are often designed to gently push you toward paid plans over time"
+      "Subscription models create smooth, predictable income for the company, which investors value.",
+      "Free tiers are often designed to gently push you toward paid plans over time."
     ],
     questions: [
       "If I refused the subscription entirely, what would they lose",
@@ -212,8 +256,8 @@ const KEYWORD_HINTS = [
   {
     keywords: ["grade", "exam", "curve", "professor", "teacher"],
     incentives: [
-      "Teachers are often rewarded for managing large groups, not for optimizing for each individual student",
-      "Strict grading or curves can protect the teacher from accusations of being too easy"
+      "Teachers are often rewarded for managing large groups, not for optimizing for each individual student.",
+      "Strict grading or curves can protect the teacher from accusations of being too easy."
     ],
     questions: [
       "What pressure is your teacher under from the institution",
@@ -223,8 +267,8 @@ const KEYWORD_HINTS = [
   {
     keywords: ["friend", "partner", "relationship", "family", "parents"],
     incentives: [
-      "People often protect their self image even more than the relationship itself",
-      "Old patterns from childhood or past relationships can drive reactions more than the current facts"
+      "People often protect their self image even more than the relationship itself.",
+      "Old patterns from childhood or past relationships can drive reactions more than the current facts."
     ],
     questions: [
       "What story about themselves might this person be trying to protect",
@@ -233,7 +277,6 @@ const KEYWORD_HINTS = [
   }
 ];
 
-// Helper to find matching hints
 function findKeywordHints(text) {
   const lower = text.toLowerCase();
   const matches = [];
@@ -248,7 +291,6 @@ function findKeywordHints(text) {
   return matches;
 }
 
-// Build a structured analysis object
 function buildAnalysis(rawText, typeKey) {
   const text = rawText.trim();
   const type = BASE_TEMPLATES[typeKey] ? typeKey : "other";
@@ -261,32 +303,31 @@ function buildAnalysis(rawText, typeKey) {
 
   hints.forEach((hint) => {
     if (hint.incentives) {
-      extraIncentives.push.apply(extraIncentives, hint.incentives);
+      extraIncentives.push(...hint.incentives);
     }
     if (hint.questions) {
-      extraQuestions.push.apply(extraQuestions, hint.questions);
+      extraQuestions.push(...hint.questions);
     }
   });
 
-  // Very short summary
   const summaryParts = [];
 
   summaryParts.push(
-    `This looks like a ${base.label.toLowerCase()} situation where different sides are responding to their own incentives, not just their stated intentions.`
+    `You described a ${base.label} situation. Different sides are following the incentives around them, not just their stated values.`
   );
 
   if (hints.length > 0) {
     summaryParts.push(
-      "Your description includes cues that suggest some specific incentive patterns are active."
+      "Your description triggers some common patterns that often show up in this kind of situation."
     );
   } else if (text.length > 0) {
     summaryParts.push(
-      "Even without special keywords, the same basic principles apply: people follow rewards, avoid pain, and work around constraints."
+      "Even without special keywords, the same basic rule applies: people move toward rewards, away from pain, and around constraints."
     );
   }
 
   summaryParts.push(
-    "Use this breakdown to see who gains what if things stay the same versus if they change."
+    "The lists below are meant to help you see who gains what if things stay the same versus if they change."
   );
 
   return {
@@ -296,11 +337,11 @@ function buildAnalysis(rawText, typeKey) {
     incentives: base.incentives.concat(extraIncentives),
     outcomes: base.outcomes.slice(),
     questions: base.questions.concat(extraQuestions),
-    moves: base.moves.slice()
+    moves: base.moves.slice(),
+    paths: { ...base.paths }
   };
 }
 
-// Render helpers
 function renderList(listEl, items) {
   listEl.innerHTML = "";
   items.forEach((item) => {
@@ -310,7 +351,6 @@ function renderList(listEl, items) {
   });
 }
 
-// Main analyze click handler
 analyzeBtn.addEventListener("click", () => {
   const text = situationInput.value.trim();
   const typeKey = situationTypeSelect.value;
@@ -333,6 +373,69 @@ analyzeBtn.addEventListener("click", () => {
   renderList(questionsList, analysis.questions);
   renderList(movesList, analysis.moves);
 
+  pathStayEl.textContent = analysis.paths.stay;
+  pathChangeInsideEl.textContent = analysis.paths.changeInside;
+  pathExitEl.textContent = analysis.paths.exit;
+
   resultSection.classList.remove("hidden");
   resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+// Copy analysis as plain text
+copyBtn.addEventListener("click", async () => {
+  const text = situationInput.value.trim();
+  if (!text || resultSection.classList.contains("hidden")) {
+    alert("Run an analysis first, then you can copy it.");
+    return;
+  }
+
+  const typeKey = situationTypeSelect.value;
+  const analysis = buildAnalysis(text, typeKey);
+
+  let out = "";
+  out += "Situation:\n";
+  out += text + "\n\n";
+
+  out += "Summary:\n";
+  out += analysis.summary + "\n\n";
+
+  out += "Key actors:\n";
+  analysis.actors.forEach((a) => (out += " - " + a + "\n"));
+  out += "\n";
+
+  out += "What each side wants:\n";
+  analysis.goals.forEach((g) => (out += " - " + g + "\n"));
+  out += "\n";
+
+  out += "Incentives and constraints:\n";
+  analysis.incentives.forEach((i) => (out += " - " + i + "\n"));
+  out += "\n";
+
+  out += "Likely outcomes:\n";
+  analysis.outcomes.forEach((o) => (out += " - " + o + "\n"));
+  out += "\n";
+
+  out += "Questions to ask:\n";
+  analysis.questions.forEach((q) => (out += " - " + q + "\n"));
+  out += "\n";
+
+  out += "Moves you can make:\n";
+  analysis.moves.forEach((m) => (out += " - " + m + "\n"));
+  out += "\n";
+
+  out += "Strategy paths:\n";
+  out += "Path A: Stay the course\n";
+  out += analysis.paths.stay + "\n\n";
+  out += "Path B: Change from inside\n";
+  out += analysis.paths.changeInside + "\n\n";
+  out += "Path C: Exit and pivot\n";
+  out += analysis.paths.exit + "\n";
+
+  try {
+    await navigator.clipboard.writeText(out);
+    alert("Analysis copied to clipboard.");
+  } catch (err) {
+    console.error(err);
+    alert("Could not copy automatically. You can still select and copy manually.");
+  }
 });
