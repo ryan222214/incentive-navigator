@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Incentive Navigator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <h1>Incentive Navigator</h1>
+      <p class="tagline">
+        Describe a situation. See the incentives behind it.
+      </p>
+    </header>
+
+    <main class="app-main">
+      <section class="panel">
+        <h2>Describe the situation</h2>
+
+        <label class="field">
+          <span>Context</span>
+          <select id="situationType">
+            <option value="work">Work or career</option>
+            <option value="money">Money, business, or pricing</option>
+            <option value="policy">Rules, policies, or institutions</option>
+            <option value="relationship">Friends, family, or social</option>
+            <option value="other">Other or not sure</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Your description</span>
+          <textarea
+            id="situationInput"
+            placeholder="Example: My bank keeps pushing me to upgrade to a paid account when the free one already works for me."
+          ></textarea>
+        </label>
+
+        <button id="analyzeBtn" class="btn primary full">
+          Analyze incentives
+        </button>
+
+        <p class="hint">
+          Do not worry about perfect wording. A couple of sentences are enough.
+        </p>
+      </section>
+
+      <section id="resultSection" class="panel hidden">
+        <h2>Incentive breakdown</h2>
+
+        <div id="quickSummary" class="quick-summary hidden"></div>
+
+        <div class="result-grid">
+          <div class="result-card">
+            <h3>Key actors</h3>
+            <ul id="actorsList"></ul>
+          </div>
+
+          <div class="result-card">
+            <h3>What each side wants</h3>
+            <ul id="goalsList"></ul>
+          </div>
+
+          <div class="result-card">
+            <h3>Incentives and constraints</h3>
+            <ul id="incentivesList"></ul>
+          </div>
+
+          <div class="result-card">
+            <h3>Likely outcomes</h3>
+            <ul id="outcomesList"></ul>
+          </div>
+
+          <div class="result-card">
+            <h3>Questions to ask</h3>
+            <ul id="questionsList"></ul>
+          </div>
+
+          <div class="result-card">
+            <h3>Moves you can make</h3>
+            <ul id="movesList"></ul>
+          </div>
+        </div>
+
+        <p class="hint">
+          This tool does not tell you what to think. It shows you how incentives shape behavior so you can choose your own path.
+        </p>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>Incentive Navigator v1 · No accounts · No tracking · Static site</span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
