@@ -1,5 +1,5 @@
-// Incentive Navigator v1.1
-// Static, no backend, no AI. Pure framework.
+// Incentive Navigator v1.2
+// Static, no backend, no AI. Pure framework with context aware patterns.
 
 const situationInput = document.getElementById("situationInput");
 const situationTypeSelect = document.getElementById("situationType");
@@ -229,10 +229,12 @@ const BASE_TEMPLATES = {
   }
 };
 
-// Keyword based tweaks
+// Keyword based tweaks with context awareness
 const KEYWORD_HINTS = [
   {
+    // Housing and rent issues, usually money or policy
     keywords: ["rent", "landlord", "lease"],
+    contexts: ["money", "policy", "other"],
     incentives: [
       "Landlords respond strongly to local supply and demand for housing, not just individual stories.",
       "If demand is high and vacancies are low, raising rent is rewarded and lowering it is punished."
@@ -243,7 +245,9 @@ const KEYWORD_HINTS = [
     ]
   },
   {
+    // Subscriptions and upsells, money context
     keywords: ["subscription", "monthly fee", "premium", "upgrade"],
+    contexts: ["money", "other"],
     incentives: [
       "Subscription models create smooth, predictable income for the company, which investors value.",
       "Free tiers are often designed to gently push you toward paid plans over time."
@@ -254,7 +258,24 @@ const KEYWORD_HINTS = [
     ]
   },
   {
+    // Sports betting and referral apps, your example
+    keywords: ["sports betting", "betting app", "sportsbook", "parlay", "gambling", "casino", "odds", "sign up bonus", "referral"],
+    contexts: ["money", "relationship", "other"],
+    incentives: [
+      "Betting platforms often use sign up bonuses and referral rewards to turn friends into unpaid sales reps.",
+      "The house designs the odds so that, on average, it wins over time, even if some users get lucky in the short run.",
+      "Friends who refer you may genuinely want you involved, but they are also rewarded if you join and play."
+    ],
+    questions: [
+      "If I ignore the sign up bonus and look only at long term expected value, does this still make sense for me",
+      "Who actually wins if I join and keep using this app over the next year",
+      "If I say no clearly once, does the social pressure go up, down, or disappear"
+    ]
+  },
+  {
+    // School and grading
     keywords: ["grade", "exam", "curve", "professor", "teacher"],
+    contexts: ["work", "policy", "other"],
     incentives: [
       "Teachers are often rewarded for managing large groups, not for optimizing for each individual student.",
       "Strict grading or curves can protect the teacher from accusations of being too easy."
@@ -265,7 +286,9 @@ const KEYWORD_HINTS = [
     ]
   },
   {
-    keywords: ["friend", "partner", "relationship", "family", "parents"],
+    // Pure relationship dynamics, only for relationship context
+    keywords: ["friend", "friends", "partner", "relationship", "family", "parents"],
+    contexts: ["relationship"],
     incentives: [
       "People often protect their self image even more than the relationship itself.",
       "Old patterns from childhood or past relationships can drive reactions more than the current facts."
@@ -277,11 +300,16 @@ const KEYWORD_HINTS = [
   }
 ];
 
-function findKeywordHints(text) {
+// Find matching hints and respect context
+function findKeywordHints(text, typeKey) {
   const lower = text.toLowerCase();
   const matches = [];
 
   KEYWORD_HINTS.forEach((hint) => {
+    const contextOk =
+      !hint.contexts || hint.contexts.includes(typeKey) || hint.contexts.includes("other");
+    if (!contextOk) return;
+
     const found = hint.keywords.some((kw) => lower.includes(kw));
     if (found) {
       matches.push(hint);
@@ -291,12 +319,13 @@ function findKeywordHints(text) {
   return matches;
 }
 
+// Build analysis object
 function buildAnalysis(rawText, typeKey) {
   const text = rawText.trim();
   const type = BASE_TEMPLATES[typeKey] ? typeKey : "other";
   const base = BASE_TEMPLATES[type];
 
-  const hints = text ? findKeywordHints(text) : [];
+  const hints = text ? findKeywordHints(text, type) : [];
 
   const extraIncentives = [];
   const extraQuestions = [];
@@ -318,16 +347,16 @@ function buildAnalysis(rawText, typeKey) {
 
   if (hints.length > 0) {
     summaryParts.push(
-      "Your description triggers some common patterns that often show up in this kind of situation."
+      "Your description matches a few common patterns that tend to show up in this kind of scenario."
     );
   } else if (text.length > 0) {
     summaryParts.push(
-      "Even without special keywords, the same basic rule applies: people move toward rewards, away from pain, and around constraints."
+      "Even without special keywords, the same rule applies: people move toward rewards, away from pain, and around constraints."
     );
   }
 
   summaryParts.push(
-    "The lists below are meant to help you see who gains what if things stay the same versus if they change."
+    "Use this breakdown to see who gains what if things stay the same versus if they change."
   );
 
   return {
@@ -381,7 +410,7 @@ analyzeBtn.addEventListener("click", () => {
   resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-// Copy analysis as plain text
+// Copy full analysis as plain text
 copyBtn.addEventListener("click", async () => {
   const text = situationInput.value.trim();
   if (!text || resultSection.classList.contains("hidden")) {
